@@ -291,7 +291,7 @@ RectTransform:
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
   m_AnchorMin: {x: 0.5, y: 0.5}
   m_AnchorMax: {x: 0.5, y: 0.5}
-  m_AnchoredPosition: {x: 0, y: 0}
+  m_AnchoredPosition: {x: 0, y: -0.0000076293945}
   m_SizeDelta: {x: 1000.1, y: 1260}
   m_Pivot: {x: 0.5, y: 0.5}
 --- !u!114 &336825234
@@ -379,7 +379,7 @@ RectTransform:
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
   m_AnchorMin: {x: 0.5, y: 0.5}
   m_AnchorMax: {x: 0.5, y: 0.5}
-  m_AnchoredPosition: {x: 0, y: 0.000061035156}
+  m_AnchoredPosition: {x: 0, y: 0.00012207031}
   m_SizeDelta: {x: 0, y: 0}
   m_Pivot: {x: 0.5, y: 0.5}
 --- !u!114 &699972486
@@ -1129,7 +1129,13 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   pairButtonPrefab: {fileID: 2252888186185037108, guid: d8d2be346b40ae5418e9446d4c529809,
     type: 3}
+  lineRendererPrefab: {fileID: 1431639802929247733, guid: 45171b5f16281ac4da56654a05cc75a4,
+    type: 3}
   ParentPanel: {fileID: 699972485}
+  scrollListViewport: {fileID: 336825233}
+  checkButton: {fileID: 940087375}
+  allButons: []
+  inConnectionButtonIndexes: 
 --- !u!1 &1392899961
 GameObject:
   m_ObjectHideFlags: 0
