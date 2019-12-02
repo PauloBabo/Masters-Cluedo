@@ -1,6 +1,11 @@
 ﻿using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
+using Mono.Data.Sqlite;
+using UnityEngine.SceneManagement;
+using System;
+using System.Data;
+using System.IO;
 using UnityEngine.UI;
 using TMPro;
 
@@ -11,9 +16,6 @@ public class PairController : MonoBehaviour
     public RectTransform ParentPanel;
     public RectTransform scrollListViewport;
     public Button checkButton;
-    string pair1String = "Emanuel // Bima";
-    string pair2String = "Paulo // Natureza";
-    string pair3String = "Xico // Xerife";
     List<string> correctPairStrings;
     List<Pair> correctPairs;
     public List<Button> allButons;
@@ -24,7 +26,11 @@ public class PairController : MonoBehaviour
     int selectedButtonIndex = -1;
     int selectedButtonPairIndex = -1;
     int selectedButtonDuality = -1;
-
+    int challengeId = 6;
+    private string conn, sqlQuery;
+    IDbConnection dbconn;
+    IDbCommand dbcmd;
+    private IDataReader reader;
 
     void Start()
     {
@@ -36,10 +42,20 @@ public class PairController : MonoBehaviour
         inConnectionButtonIndexes = new List<int>();
         connections = new List<Connection>();
 
-        correctPairStrings.Add(pair1String);
-        correctPairStrings.Add(pair2String);
-        correctPairStrings.Add(pair3String);
-        
+        string DatabaseName = "Cluedo_DB.s3db";
+        string filepath = Application.dataPath + "/Plugins/" + DatabaseName;
+        conn = "URI=file:" + filepath;
+        Debug.Log("Stablishing connection to: " + conn);
+        dbconn = new SqliteConnection(conn);
+        dbconn.Open();
+        IDbCommand dbcmd = dbconn.CreateCommand();
+        string query = "SELECT * FROM Arguments WHERE challengId = " + challengeId;
+        dbcmd.CommandText = query;
+        IDataReader reader = dbcmd.ExecuteReader();
+        while (reader.Read())
+        {
+            correctPairStrings.Add(reader.GetString(3));
+        }
 
         for (int i = 0; i < correctPairStrings.Count; i++)
         {

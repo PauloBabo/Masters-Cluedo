@@ -1,6 +1,11 @@
 ﻿using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
+using Mono.Data.Sqlite;
+using UnityEngine.SceneManagement;
+using System;
+using System.Data;
+using System.IO;
 using UnityEngine.UI;
 using TMPro;
 
@@ -13,34 +18,53 @@ public class mchoiceController : MonoBehaviour
     public Sprite choiceBtnSprite;
     public Button checkButton;
     private string question;
-    private string[] options;
-    private bool[] selected;
-    private Button[] choiceButtons;
-    private List<int> correctIndexes;
+    private List<string> options = new List<string>();
+    private List<bool> selected = new List<bool>();
+    private List<Button> choiceButtons = new List<Button>();
+    private List<int> correctIndexes = new List<int>();
+    private string conn, sqlQuery;
+    IDbConnection dbconn;
+    IDbCommand dbcmd;
+    private IDataReader reader;
+    int challengeId = 2;
     // Start is called before the first frame update
     void Start()
     {
-        question = "Quais das seguintes cores são primárias?";
-        options = new string[5];
-        selected = new bool[5];
-        correctIndexes = new List<int>();
-        choiceButtons = new Button[5];
-        correctIndexes.Add(1);
-        correctIndexes.Add(2);
-        selected[0] = false;
-        selected[1] = false;
-        selected[2] = false;
-        selected[3] = false;
-        selected[4] = false;
-        options[0] = "Laranja";
-        options[1] = "Amarelo";
-        options[2] = "Azul";
-        options[3] = "Dourado";
-        options[4] = "Cor De Bima";
+        string DatabaseName = "Cluedo_DB.s3db";
+        string filepath = Application.dataPath + "/Plugins/" + DatabaseName;
+        conn = "URI=file:" + filepath;
+        Debug.Log("Stablishing connection to: " + conn);
+        dbconn = new SqliteConnection(conn);
+        dbconn.Open();
+        IDbCommand dbcmd = dbconn.CreateCommand();
+        string query = "SELECT * FROM Arguments WHERE challengId = " + challengeId;
+        dbcmd.CommandText = query;
+        IDataReader reader = dbcmd.ExecuteReader();
+        while (reader.Read())
+        {
+            if (reader.GetInt32(2) == 1)
+            {
+                question = reader.GetString(3);
+            }
+            else if (reader.GetInt32(2) == 2)
+            {
+                string[] indexesString = reader.GetString(3).Split('/');
+                for (int i = 0; i < indexesString.Length; i++)
+                {
+                    correctIndexes.Add(Int32.Parse(indexesString[i])-1);
+                }
+            }
+            else
+            {
+                options.Add(reader.GetString(3));
+                selected.Add(false);
+            }
+        }
+        
         questionText.text = question;
 
         checkButton.onClick.AddListener(() => CheckButtonClicked());
-        for (int i = 0; i < options.Length; i++)
+        for (int i = 0; i < options.Count; i++)
         {
             GameObject choiceButton = (GameObject)Instantiate(choiceButtonPrefab);
             choiceButton.transform.SetParent(ParentPanel, false);
@@ -49,7 +73,7 @@ public class mchoiceController : MonoBehaviour
             Button tempButton = choiceButton.GetComponent<Button>();
             int index = i;
             tempButton.onClick.AddListener(() => ChoiceButtonClicked(index));
-            choiceButtons[i] = tempButton;
+            choiceButtons.Add(tempButton);
         }
     }
 
@@ -70,7 +94,7 @@ public class mchoiceController : MonoBehaviour
     void CheckButtonClicked()
     {
         List<int> selectedIndexes = new List<int>();
-        for (int i = 0; i < selected.Length; i++)
+        for (int i = 0; i < selected.Count; i++)
         {
             if (selected[i])
             {

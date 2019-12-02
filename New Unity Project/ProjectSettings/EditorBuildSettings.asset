@@ -4,5 +4,38 @@
 EditorBuildSettings:
   m_ObjectHideFlags: 0
   serializedVersion: 2
-  m_Scenes: []
+  m_Scenes:
+  - enabled: 1
+    path: Assets/mainScene.unity
+    guid: ead25e424f1872f4b95cb7017551bd8d
+  - enabled: 1
+    path: Assets/challengeSelectionScene.unity
+    guid: 0f642e3a613a7744e94ba00428a5f601
+  - enabled: 1
+    path: Assets/chapterSelectionScene.unity
+    guid: 470d32a60d786724da32606ad80af9e6
+  - enabled: 1
+    path: Assets/choiceScene.unity
+    guid: 7b07db83baebcf1458a9e7ca67846b8c
+  - enabled: 1
+    path: Assets/crosswordScene.unity
+    guid: 0e9a7293f42c76041a39487647468529
+  - enabled: 1
+    path: Assets/fillScene.unity
+    guid: 813e3a49e11d3fa41b4f8fbc3f22fd65
+  - enabled: 1
+    path: Assets/groupScene.unity
+    guid: b83a378f2d1ce1a43ab574f3eb91814d
+  - enabled: 1
+    path: Assets/lettersScene.unity
+    guid: b576bfbe30e24254891ef947039650c1
+  - enabled: 1
+    path: Assets/mainMenuScene.unity
+    guid: 2c46e4dd5b0f98042af286e9004cb85f
+  - enabled: 1
+    path: Assets/mchoiceScene.unity
+    guid: afc31d121d18ad04f90e261e07fe081a
+  - enabled: 1
+    path: Assets/pairScene.unity
+    guid: b648e03216ff9ef48bf9cf41c9b31615
   m_configObjects: {}

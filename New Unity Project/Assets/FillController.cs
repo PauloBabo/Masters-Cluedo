@@ -1,6 +1,11 @@
 ﻿using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
+using Mono.Data.Sqlite;
+using UnityEngine.SceneManagement;
+using System;
+using System.Data;
+using System.IO;
 using UnityEngine.UI;
 using TMPro;
 
@@ -14,15 +19,50 @@ public class FillController : MonoBehaviour
     string formatString;
     string[] questionTexts;
     string[] spaceTexts;
-    string[] options;
+    List<string> options = new List<string>();
     Button[] choiceButtons;
-    int[] correctIndexes;
-    int[] selectedIndexes;
-    bool[] selectedButtons;
+    List<int> correctIndexes = new List<int>();
+    List<int> selectedIndexes = new List<int>();
+    List<bool> selectedButtons = new List<bool>();
+    private string conn, sqlQuery;
+    IDbConnection dbconn;
+    IDbCommand dbcmd;
+    private IDataReader reader;
+    int challengeId = 3;
     // Start is called before the first frame update
     void Start()
     {
-        question = "The (_) is the (_) of the cell!";
+        string DatabaseName = "Cluedo_DB.s3db";
+        string filepath = Application.dataPath + "/Plugins/" + DatabaseName;
+        conn = "URI=file:" + filepath;
+        Debug.Log("Stablishing connection to: " + conn);
+        dbconn = new SqliteConnection(conn);
+        dbconn.Open();
+        IDbCommand dbcmd = dbconn.CreateCommand();
+        string query = "SELECT * FROM Arguments WHERE challengId = " + challengeId;
+        dbcmd.CommandText = query;
+        IDataReader reader = dbcmd.ExecuteReader();
+        while (reader.Read())
+        {
+            if (reader.GetInt32(2) == 1)
+            {
+                question = reader.GetString(3);
+            }
+            else if (reader.GetInt32(2) == 2)
+            {
+                string[] indexesString = reader.GetString(3).Split('/');
+                for (int i = 0; i < indexesString.Length; i++)
+                {
+                    correctIndexes.Add(Int32.Parse(indexesString[i]) - 1);
+                }
+            }
+            else
+            {
+                options.Add(reader.GetString(3));
+                selectedButtons.Add(false);
+                selectedIndexes.Add(-1);
+            }
+        }
         string needle = "(_)";
         int nSpaces = (question.Length - question.Replace(needle, "").Length) / needle.Length;
         questionTexts = question.Split(new string[] { "(_)" }, System.StringSplitOptions.None);
@@ -35,33 +75,7 @@ public class FillController : MonoBehaviour
         formatString = CreateFormatString(question);
         UpdateQuestionText();
 
-
-        Debug.Log("Espaços: " + nSpaces);
-        Debug.Log("Questoes: " + questionTexts.Length);
-
-        int nOptions = 6;
-        options = new string[nOptions];
-        options[0] = "Cromossome";
-        options[1] = "RNA";
-        options[2] = "DNA";
-        options[3] = "Ribossome";
-        options[4] = "Power-house";
-        options[5] = "Mitocondrea";
-
-        selectedButtons = new bool[nOptions];
-        for (int i = 0; i < selectedButtons.Length; i++)
-            selectedButtons[i] = false;
-
-        correctIndexes = new int[nSpaces];
-        correctIndexes[0] = 5;
-        correctIndexes[1] = 4;
-
-
-        selectedIndexes = new int[nSpaces];
-        for (int i = 0; i < selectedIndexes.Length; i++)
-            selectedIndexes[i] = -1;
-
-        choiceButtons = new Button[nOptions];
+        choiceButtons = new Button[options.Count];
         for (int i = 0; i < choiceButtons.Length; i++)
         {
             GameObject choiceButton = (GameObject)Instantiate(fillButtonPrefab);
@@ -81,7 +95,7 @@ public class FillController : MonoBehaviour
         if (!selectedButtons[index])
         {
             bool updated = false;
-            for (int i = 0; i < selectedIndexes.Length; i++)
+            for (int i = 0; i < selectedIndexes.Count; i++)
             {
                 if (selectedIndexes[i] == -1)
                 {
@@ -100,7 +114,7 @@ public class FillController : MonoBehaviour
         }
         else
         {
-            for (int i = 0; i < selectedIndexes.Length; i++)
+            for (int i = 0; i < selectedIndexes.Count; i++)
             {
                 if (selectedIndexes[i] == index)
                 {
@@ -171,7 +185,7 @@ public class FillController : MonoBehaviour
 
     void CheckButtonClicked()
     {
-        for (int i = 0; i < correctIndexes.Length; i++)
+        for (int i = 0; i < correctIndexes.Count; i++)
         {
             if (selectedIndexes[i] != correctIndexes[i])
             {

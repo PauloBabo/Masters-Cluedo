@@ -1,9 +1,14 @@
 ﻿using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
+using Mono.Data.Sqlite;
+using UnityEngine.SceneManagement;
+using System;
+using System.Data;
+using System.IO;
 using UnityEngine.UI;
-using System.Linq;
 using TMPro;
+using System.Linq;
 
 public class CrosswordController : MonoBehaviour
 {
@@ -17,44 +22,29 @@ public class CrosswordController : MonoBehaviour
     GameObject[,] gridCells;
     public GameObject scrollListContent;
     Crossword crossword;
-    
+    private string conn, sqlQuery;
+    IDbConnection dbconn;
+    IDbCommand dbcmd;
+    private IDataReader reader;
+    int challengeId = 4;
+
     // Start is called before the first frame update
     void Start()
     {
-        
-        string wordHint1 = "wordHint1:period";
-        string wordHint2 = "wordHint2:meaning";
-        string wordHint3 = "wordHint3:terms";
-        string wordHint4 = "wordHint4:rush";
-        string wordHint5 = "wordHint5:teach";
-        string wordHint6 = "wordHint6:deal";
-        string wordHint7 = "wordHint7:socialism";
-        string wordHint8 = "wordHint8:technology";
-        string wordHint9 = "wordHint9:battery";
-        string wordHint10 = "wordHint10:winner";
-        string wordHint11 = "wordHint11:cheap";
-        string wordHint12 = "wordHint12:posture";
-        string wordHint13 = "wordHint13:night";
-        string wordHint14 = "wordHint14:confidence";
-        string wordHint15 = "wordHint15:person";
-
-        hintsAndWords.Add(wordHint1);
-        hintsAndWords.Add(wordHint2);
-        hintsAndWords.Add(wordHint3);
-        hintsAndWords.Add(wordHint4);
-        hintsAndWords.Add(wordHint5);
-        hintsAndWords.Add(wordHint6);
-        hintsAndWords.Add(wordHint7);
-        hintsAndWords.Add(wordHint8);
-        hintsAndWords.Add(wordHint9);
-        hintsAndWords.Add(wordHint10);
-        hintsAndWords.Add(wordHint11);
-        hintsAndWords.Add(wordHint12);
-        hintsAndWords.Add(wordHint13);
-        hintsAndWords.Add(wordHint14);
-        hintsAndWords.Add(wordHint15);
-        
-       
+        string DatabaseName = "Cluedo_DB.s3db";
+        string filepath = Application.dataPath + "/Plugins/" + DatabaseName;
+        conn = "URI=file:" + filepath;
+        Debug.Log("Stablishing connection to: " + conn);
+        dbconn = new SqliteConnection(conn);
+        dbconn.Open();
+        IDbCommand dbcmd = dbconn.CreateCommand();
+        string query = "SELECT * FROM Arguments WHERE challengId = " + challengeId;
+        dbcmd.CommandText = query;
+        IDataReader reader = dbcmd.ExecuteReader();
+        while (reader.Read())
+        {
+            hintsAndWords.Add(reader.GetString(3));
+        }
 
         for (int i = 0; i < hintsAndWords.Count; i++)
         {

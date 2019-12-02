@@ -1,6 +1,11 @@
 ﻿using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
+using Mono.Data.Sqlite;
+using UnityEngine.SceneManagement;
+using System;
+using System.Data;
+using System.IO;
 using UnityEngine.UI;
 using TMPro;
 
@@ -14,16 +19,49 @@ public class GroupController : MonoBehaviour
     List<GroupQuestion> groupQuestions = new List<GroupQuestion>();
     List<Button> buttons = new List<Button>();
     int currentQuestionIndex = 0;
+    int challengeId = 7;
+    private string conn, sqlQuery;
+    IDbConnection dbconn;
+    IDbCommand dbcmd;
+    private IDataReader reader;
 
     // Start is called before the first frame update
     void Start()
     {
+        string DatabaseName = "Cluedo_DB.s3db";
+        string filepath = Application.dataPath + "/Plugins/" + DatabaseName;
+        conn = "URI=file:" + filepath;
+        Debug.Log("Stablishing connection to: " + conn);
+        dbconn = new SqliteConnection(conn);
+        dbconn.Open();
+        IDbCommand dbcmd = dbconn.CreateCommand();
+        string query = "SELECT * FROM Arguments WHERE challengId = " + challengeId;
+        dbcmd.CommandText = query;
+        IDataReader reader = dbcmd.ExecuteReader();
+        string options = "";
+        string leftQuestions = "";
+        string rightQuestions = "";
+        while (reader.Read())
+        {
+            if (reader.GetInt32(2) == 1)
+            {
+                options = reader.GetString(3);
+            }
+            else if (reader.GetInt32(2) == 2)
+            {
+                leftQuestions = reader.GetString(3);
+            }
+            else if (reader.GetInt32(2) == 3)
+            {
+                rightQuestions = reader.GetString(3);
+            }
+        }
+
         buttons.Add(leftButton);
         buttons.Add(rightButton);
 
-        string options = "Sim // Não";
-        string leftQuestions = "O Bima gosta de canho? // Vou ficar todo cego hoje? // Quero Binho!";
-        string rightQuestions = "O Bima é branco? // Consegues ver o Bima?";
+       
+ 
 
         string[] optionsSeparated = options.Split(new string[] { " // " }, System.StringSplitOptions.None);
         string[] leftQuestionsSeparated = leftQuestions.Split(new string[] { " // " }, System.StringSplitOptions.None);
